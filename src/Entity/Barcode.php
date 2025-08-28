@@ -1,6 +1,6 @@
 <?php
 
-namespace TicketSwap\Assessment;
+namespace TicketSwap\Assessment\Entity;
 
 final class Barcode implements \Stringable
 {

@@ -5,13 +5,13 @@ namespace TicketSwap\Assessment\tests;
 use PHPUnit\Framework\TestCase;
 use Money\Currency;
 use Money\Money;
-use TicketSwap\Assessment\Barcode;
-use TicketSwap\Assessment\Buyer;
-use TicketSwap\Assessment\Listing;
-use TicketSwap\Assessment\ListingId;
-use TicketSwap\Assessment\Seller;
-use TicketSwap\Assessment\Ticket;
-use TicketSwap\Assessment\TicketId;
+use TicketSwap\Assessment\Entity\Barcode;
+use TicketSwap\Assessment\Entity\Buyer;
+use TicketSwap\Assessment\Entity\Listing;
+use TicketSwap\Assessment\Entity\ListingId;
+use TicketSwap\Assessment\Entity\Seller;
+use TicketSwap\Assessment\Entity\Ticket;
+use TicketSwap\Assessment\Entity\TicketId;
 
 class ListingTest extends TestCase
 {

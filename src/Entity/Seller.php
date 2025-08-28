@@ -1,8 +1,8 @@
 <?php
 
-namespace TicketSwap\Assessment;
+namespace TicketSwap\Assessment\Entity;
 
-final class Buyer implements \Stringable
+final class Seller implements \Stringable
 {
     public function __construct(private string $name)
     {
