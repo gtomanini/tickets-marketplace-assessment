@@ -19,17 +19,6 @@ final class Marketplace
         return $this->listingsForSale;
     }
 
-    public function buyTicket(Buyer $buyer, TicketId $ticketId) : Ticket
-    {
-        foreach($this->listingsForSale as $listing) {
-            foreach($listing->getTickets() as $ticket) {
-                if ($ticket->getId()->equals($ticketId)) {
-                   return $ticket->buyTicket($buyer); 
-                }
-            }
-        }
-    }
-
     public function setListingForSale(Listing $listing) : void
     {
 
