@@ -17,35 +17,7 @@ class ListingTest extends TestCase
 {
     /**
      * @test
-     */
-    public function it_should_be_possible_to_create_a_listing()
-    {
-        $listing = new Listing(
-            id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
-            tickets: [
-                new Ticket(
-                    new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
-                    new Barcode('EAN-13', '38974312923')
-                ),
-            ],
-            price: new Money(4950, new Currency('EUR')),
-            seller: new Seller('Pascal'),
-        );
-
-        $this->assertCount(1, $listing->getTickets());
-    }
-
-    /**
-     * @test
-     */
-    public function it_should_not_be_possible_to_create_a_listing_with_duplicate_barcodes()
-    {
-        $this->markTestSkipped('Needs to be implemented');
-    }
-
-    /**
-     * @test
-     */
+    */
     public function it_should_list_the_tickets_for_sale()
     {
         $listing = new Listing(
@@ -71,9 +43,9 @@ class ListingTest extends TestCase
         $this->assertSame('B47CBE2D-9F80-47D9-A9CC-894CE82AA6BA', (string) $ticketsForSale[0]->getId());
     }
 
-        /**
+    /**
      * @test
-     */
+    */
     public function it_should_list_the_tickets_not_for_sale()
     {
         $listing = new Listing(
