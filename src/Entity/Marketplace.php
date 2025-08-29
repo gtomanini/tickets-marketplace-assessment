@@ -14,7 +14,7 @@ final class Marketplace
     /**
      * @return array<Listing>
      */
-    public function getListingsForSale() : array
+    public function getListings() : array
     {
         return $this->listingsForSale;
     }
