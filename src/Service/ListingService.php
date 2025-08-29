@@ -11,8 +11,10 @@ use Money\Money;
 use Ramsey\Uuid\Uuid;
 
 final class ListingService {
+    
     public function __construct() 
-    {}
+    {
+    }
 
     /**
      * Creates a new Listing instance for a seller.
@@ -33,6 +35,8 @@ final class ListingService {
             throw ListingCreationException::withReason('The listing price must be greater than zero.');
         }
 
+        $this->checkForDuplicateBarcodeOnListing($tickets);
+
         try {
             $listing = new Listing(
                 id: new ListingId(Uuid::uuid4()->toString()),
@@ -45,6 +49,28 @@ final class ListingService {
         }
 
         return $listing;
+    }
+
+    /**
+     * Search for duplicate barcodes in the provided tickets array.
+     *
+     * @param array $tickets
+     * @throws ListingCreationException if duplicates are found.
+     */
+    private function checkForDuplicateBarcodeOnListing(array $tickets): void
+    {
+        $barcodes = [];
+        foreach ($tickets as $ticket) {
+            $barcodeValue = $ticket->getBarcode();
+
+            if (in_array($barcodeValue, $barcodes)) {
+                throw ListingCreationException::withReason(
+                    sprintf('Duplicate barcode found in the listing: %s', $barcodeValue)
+                );
+            }
+
+            $barcodes[] = $barcodeValue;
+        }
     }
 
 }
