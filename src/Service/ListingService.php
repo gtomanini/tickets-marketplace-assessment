@@ -47,6 +47,7 @@ final class ListingService {
         }
 
         $this->checkForDuplicateBarcodeOnListing($tickets);
+        $this->checkForDuplicatedBarcodeOnMarketplace($tickets);
 
         try {
             $listing = new Listing(
@@ -83,6 +84,40 @@ final class ListingService {
 
             $barcodes[] = $barcodeValue;
         }
+    }
+
+
+    /**     
+     * Check if any of the tickets' barcodes are already listed in the marketplace.
+     *
+     * @param array $tickets
+     * @throws ListingCreationException if any ticket's barcode is already for sale.
+     */
+    private function checkForDuplicatedBarcodeOnMarketplace(array $tickets): void
+    {
+        foreach ($tickets as $ticket) {
+            if ($this->isBarcodeAlreadyForSale($ticket->getBarcode())) {
+                throw ListingCreationException::withReason(
+                    sprintf('Ticket with barcode %s is already for sale.', $ticket->getBarcode())
+                );
+            }
+        }
+    }
+
+    /**
+     * Check if a barcode is already listed for sale in the marketplace.
+     *
+     * @param string $barcode
+     * @return bool true if the barcode is already for sale, false otherwise.
+     */
+    private function isBarcodeAlreadyForSale($barcode): bool
+    {
+        $isTicketAlreadyForSale = $this->listingRepository->findTicketByBarcode($barcode);
+
+        if( $isTicketAlreadyForSale !== null ) {
+            return true;
+        }
+        return false;
     }
 
 }

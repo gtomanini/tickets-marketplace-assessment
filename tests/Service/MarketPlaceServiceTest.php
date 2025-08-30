@@ -13,6 +13,7 @@ use TicketSwap\Assessment\Entity\Marketplace;
 use TicketSwap\Assessment\Entity\Seller;
 use TicketSwap\Assessment\Entity\Ticket;
 use TicketSwap\Assessment\Entity\TicketId;
+use TicketSwap\Assessment\Exception\ListingCreationException;
 use TicketSwap\Assessment\Exception\TicketAlreadySoldException;
 use TicketSwap\Assessment\Repository\ListingRepository;
 use TicketSwap\Assessment\Service\ListingService;
@@ -206,7 +207,54 @@ class MarketPlaceServiceTest extends TestCase
      */
     public function it_should_not_be_possible_to_sell_a_ticket_with_a_barcode_that_is_already_for_sale()
     {
-        $this->markTestSkipped('Needs to be implemented');
+        $this->expectException(ListingCreationException::class);
+        $this->expectExceptionMessage('Ticket with barcode EAN-13:38974312923 is already for sale.');
+
+        $existingTicket = new Ticket(
+                        new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
+                        new Barcode('EAN-13', '38974312923')
+            );
+
+        $existingListing = new Listing(
+                id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
+                seller: new Seller('Pascal'),
+                tickets: [
+                    $existingTicket
+                ],
+                price: new Money(4950, new Currency('EUR')),
+            );
+
+        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository->method('findTicketByBarcode')
+            ->willReturn($existingTicket);
+
+        $marketplace = new Marketplace(
+            listingsForSale: []
+        );
+
+        $marketplaceService = new MarketPlaceService(
+            $marketplace, new ListingService($mockedListingRepository)
+        );
+
+        $marketplaceService->setListingToSell(
+            $existingListing
+        );
+
+        $newListing = new Listing(
+                id: new ListingId('26A7E5C4-3F59-4B3C-B5EB-6F2718BC31AD'),
+                seller: new Seller('Tom'),
+                tickets: [
+                    new Ticket(
+                        new TicketId('45B96761-E533-4925-859F-3CA62182848E'),
+                        new Barcode('EAN-13', '38974312923')
+                    ),
+                ],
+                price: new Money(4950, new Currency('EUR')),
+            );
+
+        $marketplaceService->setListingToSell(
+            $newListing
+        );
     }
 
     /**
