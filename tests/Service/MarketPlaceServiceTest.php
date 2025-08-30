@@ -14,6 +14,8 @@ use TicketSwap\Assessment\Entity\Seller;
 use TicketSwap\Assessment\Entity\Ticket;
 use TicketSwap\Assessment\Entity\TicketId;
 use TicketSwap\Assessment\Exception\TicketAlreadySoldException;
+use TicketSwap\Assessment\Repository\ListingRepository;
+use TicketSwap\Assessment\Service\ListingService;
 use TicketSwap\Assessment\Service\MarketPlaceService;
 
 class MarketPlaceServiceTest extends TestCase
@@ -24,29 +26,29 @@ class MarketPlaceServiceTest extends TestCase
      */
     public function it_should_list_all_the_tickets_for_sale()
     {
-        $marketplace = new Marketplace(
-            listingsForSale: [
-                new Listing(
-                    id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
-                    seller: new Seller('Pascal'),
-                    tickets: [
-                        new Ticket(
-                            new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
-                            new Barcode('EAN-13', '38974312923')
-                        ),
-                    ],
-                    price: new Money(4950, new Currency('EUR')),
-                ),
-            ]
-        );
+        $listing = new Listing(
+                                id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
+                                seller: new Seller('Pascal'),
+                                tickets: [
+                                    new Ticket(
+                                        new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
+                                        new Barcode('EAN-13', '38974312923')
+                                    ),
+                                ],
+                                price: new Money(4950, new Currency('EUR')),
+                            );
+        
+        $marketplace = new Marketplace(listingsForSale: []);
 
         $marketplaceService = new MarketPlaceService(
-            $marketplace
+            $marketplace, new ListingService(new ListingRepository())
         );
+
+        $marketplaceService->setListingToSell($listing);
 
         $listingsForSale = $marketplaceService->getListingsForSale();
 
-        $this->assertCount(1, $listingsForSale);
+        $this->assertSame($listing->getTickets(), $listingsForSale[0]->getTickets());
     }
 
     /**
@@ -71,7 +73,7 @@ class MarketPlaceServiceTest extends TestCase
         );
 
         $marketplaceService = new MarketPlaceService(
-            $marketplace
+            $marketplace, new ListingService(new ListingRepository())
         );
 
         $boughtTicket = $marketplaceService->buyTicket(
@@ -88,9 +90,7 @@ class MarketPlaceServiceTest extends TestCase
      */
     public function it_should_not_list_empty_listings_for_sale() : void 
     {
-        $marketplace = new Marketplace(
-            listingsForSale: [
-                new Listing(
+        $listingWithTicket = new Listing(
                     id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
                     seller: new Seller('Pascal'),
                     tickets: [
@@ -100,23 +100,32 @@ class MarketPlaceServiceTest extends TestCase
                         ),
                     ],
                     price: new Money(4950, new Currency('EUR')),
-                ),
-                new Listing(
+                );
+
+        $listingWithoutTicket = new Listing(
                     id: new ListingId('26A7E5C4-3F59-4B3C-B5EB-6F2718BC31AD'),
                     seller: new Seller('Tom'),
                     tickets: [],
                     price: new Money(4950, new Currency('EUR')),
-                ),
-            ]
+        );
+
+        $marketplace = new Marketplace(
+            listingsForSale: []
         );
         
+        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository->method('findAll')
+            ->willReturn([$listingWithTicket, $listingWithoutTicket]);
+
         $marketplaceService = new MarketPlaceService(
-            $marketplace
+            $marketplace, new ListingService($mockedListingRepository)
         );
         
         $listingsForSale = $marketplaceService->getListingsForSale();
-        
+
+        $this->assertNotNull($listingsForSale);
         $this->assertCount(1, $listingsForSale);
+        $this->assertSame($listingWithTicket, $listingsForSale[0]);
     }
 
 
@@ -125,26 +134,31 @@ class MarketPlaceServiceTest extends TestCase
      */
     public function it_should_not_be_possible_to_buy_the_same_ticket_twice()
     {
-        $marketplace = new Marketplace(
-            listingsForSale: [
-                new Listing(
+        $this->expectException(TicketAlreadySoldException::class);
+
+        $listing = new Listing(
                     id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
                     seller: new Seller('Pascal'),
                     tickets: [
                         new Ticket(
                             new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
-                            new Barcode('EAN-13', '38974312923')
+                            new Barcode('EAN-13', '38974312923'),
+                            new Buyer('Sarah')
                         ),
                     ],
                     price: new Money(4950, new Currency('EUR')),
-                ),
+                );
+
+        $marketplace = new Marketplace(
+            listingsForSale: [
+                $listing
             ]
         );
 
-        $this->expectException(TicketAlreadySoldException::class);
 
         $marketplaceService = new MarketPlaceService(
-            $marketplace
+            $marketplace,
+            new ListingService(new ListingRepository())
         );
 
         $marketplaceService->buyTicket(
@@ -158,24 +172,7 @@ class MarketPlaceServiceTest extends TestCase
      */
     public function it_should_be_possible_to_put_a_listing_for_sale()
     {
-        $marketplace = new Marketplace(
-            listingsForSale: [
-                new Listing(
-                    id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
-                    seller: new Seller('Pascal'),
-                    tickets: [
-                        new Ticket(
-                            new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
-                            new Barcode('EAN-13', '38974312923')
-                        ),
-                    ],
-                    price: new Money(4950, new Currency('EUR')),
-                ),
-            ]
-        );
-
-        $marketplace->setListingForSale(
-            new Listing(
+        $listing = new Listing(
                 id: new ListingId('26A7E5C4-3F59-4B3C-B5EB-6F2718BC31AD'),
                 seller: new Seller('Tom'),
                 tickets: [
@@ -185,12 +182,23 @@ class MarketPlaceServiceTest extends TestCase
                     ),
                 ],
                 price: new Money(4950, new Currency('EUR')),
-            )
+            );
+
+        $marketplace = new Marketplace(
+            listingsForSale: []
         );
 
-        $listingsForSale = $marketplace->getListings();
+        $marketplaceService = new MarketPlaceService(
+            $marketplace, new ListingService(new ListingRepository())
+        );
 
-        $this->assertCount(2, $listingsForSale);
+        $marketplaceService->setListingToSell(
+            $listing
+        );
+
+        $listingsForSale = $marketplaceService->getListingsForSale();
+
+        $this->assertSame($listing->getSeller(), $listingsForSale[0]->getSeller());
     }
 
     /**

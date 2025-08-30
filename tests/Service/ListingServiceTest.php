@@ -11,6 +11,7 @@ use TicketSwap\Assessment\Entity\Seller;
 use TicketSwap\Assessment\Entity\Ticket;
 use TicketSwap\Assessment\Entity\TicketId;
 use TicketSwap\Assessment\Exception\ListingCreationException;
+use TicketSwap\Assessment\Repository\ListingRepository;
 use TicketSwap\Assessment\Service\ListingService;
 
 class ListingServiceTest extends TestCase
@@ -21,7 +22,7 @@ class ListingServiceTest extends TestCase
     */
     public function it_should_be_possible_to_create_a_listing(): void
     {
-        $listingService = new ListingService();
+        $listingService = new ListingService(new ListingRepository());
         
         $createdListing = $listingService->createListing(
             seller: new Seller('Pascal'),
@@ -45,7 +46,7 @@ class ListingServiceTest extends TestCase
         $this->expectException(ListingCreationException::class);
         $this->expectExceptionMessage('A listing cannot be created without tickets.');
 
-        $listingService = new ListingService();
+        $listingService = new ListingService(new ListingRepository());
 
         $listingService->createListing(
             seller: new Seller('Pascal'),
@@ -62,7 +63,7 @@ class ListingServiceTest extends TestCase
         $this->expectException(ListingCreationException::class);
         $this->expectExceptionMessage('The listing price must be greater than zero.');
 
-        $listingService = new ListingService();
+        $listingService = new ListingService(new ListingRepository());
 
         $listingService->createListing(
             seller: new Seller('Pascal'),
@@ -84,7 +85,7 @@ class ListingServiceTest extends TestCase
         $this->expectException(ListingCreationException::class);
         $this->expectExceptionMessage('Duplicate barcode found in the listing: EAN-13:38974312923');
 
-        $listingService = new ListingService();
+        $listingService = new ListingService(new ListingRepository());
 
         $listingService->createListing(
             seller: new Seller('Pascal'),

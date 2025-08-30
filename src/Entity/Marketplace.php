@@ -14,13 +14,17 @@ final class Marketplace
     /**
      * @return array<Listing>
      */
-    public function getListings() : array
+    public function getListingsForSale() : array
     {
         return $this->listingsForSale;
     }
 
+    /**
+     * @param Listing $listing
+     * @return void
+     */
     public function setListingForSale(Listing $listing) : void
     {
-
+       $this->listingsForSale[] = $listing;
     }
 }

@@ -7,19 +7,35 @@ use TicketSwap\Assessment\Entity\Listing;
 use TicketSwap\Assessment\Entity\Marketplace;
 use TicketSwap\Assessment\Entity\Ticket;
 use TicketSwap\Assessment\Entity\TicketId;
+use TicketSwap\Assessment\Exception\TicketAlreadySoldException;
+use TicketSwap\Assessment\Repository\ListingRepository;
 
 final class MarketPlaceService
 {
-    public function __construct(private Marketplace $marketplace)
+    public function __construct(private Marketplace $marketplace, private ListingService $listingService)
     {
     }
 
     /**
+     * @param Listing $listing
+     * @return void
+     */
+    public function setListingToSell(Listing $listing): void
+    {
+        foreach ($listing->getTickets() as $ticket) {
+            // TODO implement to check if barcode is already for sale
+        }
+
+        $this->listingService->createListing($listing->getSeller(), $listing->getTickets(), $listing->getPrice());
+    }
+
+    /**
      * @return array<Listing>
+     * @return null if no listings are available for sale
      */
     public function getListingsForSale() : ?array
     {
-        $allListings = $this->marketplace->getListings();
+        $allListings = $this->listingService->findAll();
 
         $filteredListings = array_filter(
             $allListings,
@@ -36,18 +52,21 @@ final class MarketPlaceService
     }
 
     /**
-     * @return Ticket
+     * @param Buyer $buyer
+     * @param TicketId $ticketId
+     * @return Ticket if ticket is available for purchase
+     * @throws TicketAlreadySoldException if the ticket is already sold
      */
     public function buyTicket(Buyer $buyer, TicketId $ticketId) : Ticket
     {
-        foreach($this->marketplace->getListings() as $listing) {
+        foreach($this->marketplace->getListingsForSale() as $listing) {
             foreach($listing->getTickets() as $ticket) {
-                if ($ticket->getId()->equals($ticketId)) {
+                if ($ticket->getId()->equals($ticketId) && !$ticket->isBought()) {
                    return $ticket->buyTicket($buyer); 
                 }
             }
         }
-        throw new \InvalidArgumentException(sprintf("Ticket with ID %s not found for sale.", (string) $ticketId));
+        throw new TicketAlreadySoldException();
     }
 
 }

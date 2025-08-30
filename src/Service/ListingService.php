@@ -9,11 +9,22 @@ use TicketSwap\Assessment\Entity\ListingId;
 use TicketSwap\Assessment\Exception\ListingCreationException;
 use Money\Money;
 use Ramsey\Uuid\Uuid;
+use TicketSwap\Assessment\Repository\ListingRepository;
 
 final class ListingService {
     
-    public function __construct() 
+    public function __construct(private ListingRepository $listingRepository) 
     {
+    }
+
+    /**
+     * Retrieves all listings.
+     *
+     * @return array<Listing> an array of all listings
+     */
+    public function findAll(): array
+    {
+        return $this->listingRepository->findAll();
     }
 
     /**
@@ -44,6 +55,7 @@ final class ListingService {
                 tickets: $tickets, 
                 price: $price
             );
+            $this->listingRepository->save($listing);
         } catch (\InvalidArgumentException $e) {
             throw ListingCreationException::withReason('The listing composition is invalid: ' . $e->getMessage());
         }
