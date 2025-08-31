@@ -5,6 +5,7 @@ namespace TicketSwap\Assessment\tests\Service;
 use PHPUnit\Framework\TestCase;
 use Money\Currency;
 use Money\Money;
+use TicketSwap\Assessment\Entity\Admin;
 use TicketSwap\Assessment\Entity\Barcode;
 use TicketSwap\Assessment\Entity\Buyer;
 use TicketSwap\Assessment\Entity\Listing;
@@ -14,6 +15,7 @@ use TicketSwap\Assessment\Entity\Seller;
 use TicketSwap\Assessment\Entity\Ticket;
 use TicketSwap\Assessment\Entity\TicketId;
 use TicketSwap\Assessment\Exception\ListingCreationException;
+use TicketSwap\Assessment\Exception\ListingNotVerifiedException;
 use TicketSwap\Assessment\Exception\TicketAlreadySoldException;
 use TicketSwap\Assessment\Repository\ListingRepository;
 use TicketSwap\Assessment\Service\ListingService;
@@ -55,8 +57,104 @@ class MarketPlaceServiceTest extends TestCase
     /**
      * @test
      */
-    public function it_should_be_possible_to_buy_a_ticket()
+    public function it_should_list_only_verified_listings_for_sale()
     {
+        $verifiedListing = new Listing(
+                                id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
+                                seller: new Seller('Pascal'),
+                                tickets: [
+                                    new Ticket(
+                                        new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
+                                        new Barcode('EAN-13', '38974312923')
+                                    ),
+                                ],
+                                price: new Money(4950, new Currency('EUR')),
+                                isVerified: true,
+                                verifiedBy: new Admin('AdminUser')
+                            );
+
+        $unverifiedListing = new Listing(
+                                id: new ListingId('26A7E5C4-3F59-4B3C-B5EB-6F2718BC31AD'),
+                                seller: new Seller('Tom'),
+                                tickets: [
+                                    new Ticket(
+                                        new TicketId('45B96761-E533-4925-859F-3CA62182848E'),
+                                        new Barcode('EAN-13', '893759834')
+                                    ),
+                                ],
+                                price: new Money(4950, new Currency('EUR')),
+                                isVerified: false
+                            );
+
+        $marketplace = new Marketplace(listingsForSale: []);
+
+        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository->method('findAllVerified')
+            ->willReturn([$verifiedListing]);
+
+        $marketplaceService = new MarketPlaceService(
+            $marketplace, new ListingService($mockedListingRepository)
+        );
+
+        $marketplaceService->setListingToSell($verifiedListing);
+        $marketplaceService->setListingToSell($unverifiedListing);
+
+        $listingsForSale = $marketplaceService->getVerifiedListingsForSale();
+
+        $this->assertCount(1, $listingsForSale);
+        $this->assertSame($verifiedListing, $listingsForSale[0]);
+    }
+
+
+    /**
+     * @test
+     */
+    public function it_should_be_possible_to_buy_a_ticket_from_a_verified_list()
+    {
+        $listingWithTicket = new Listing(
+                    id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
+                    seller: new Seller('Pascal'),
+                    tickets: [
+                        new Ticket(
+                            new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
+                            new Barcode('EAN-13', '38974312923')
+                        ),
+                    ],
+                    price: new Money(4950, new Currency('EUR')),
+                    isVerified: true,
+                    verifiedBy: new Admin('AdminUser')
+                );
+
+        $marketplace = new Marketplace(
+            listingsForSale: [
+                $listingWithTicket
+            ]
+        );
+
+        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository->method('findAll')
+            ->willReturn([$listingWithTicket]);
+
+        $marketplaceService = new MarketPlaceService(
+            $marketplace, new ListingService($mockedListingRepository)
+        );
+
+        $boughtTicket = $marketplaceService->buyTicket(
+            buyer: new Buyer('Sarah'),
+            ticketId: new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B')
+        );
+
+        $this->assertNotNull($boughtTicket);
+        $this->assertSame('EAN-13:38974312923', (string) $boughtTicket->getBarcode());
+    }
+
+    /**
+     * @test
+     */
+    public function it_should_not_be_possible_to_buy_a_ticket_from_an_unverified_list()
+    {
+        $this->expectException(ListingNotVerifiedException::class);
+        $this->expectExceptionMessage('Cannot buy ticket from unverified listing.');
         $listingWithTicket = new Listing(
                     id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
                     seller: new Seller('Pascal'),
@@ -268,11 +366,6 @@ class MarketPlaceServiceTest extends TestCase
      */
     public function it_should_be_possible_for_a_buyer_of_a_ticket_to_sell_it_again()
     {
-        $repository = new ListingRepository();
-        $marketplace = new Marketplace(listingsForSale: []);
-        $marketplaceService = new MarketPlaceService(
-            $marketplace, new ListingService($repository)
-        );
 
         $originalListing = new Listing(
                 id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
@@ -284,10 +377,26 @@ class MarketPlaceServiceTest extends TestCase
                     ),
                 ],
                 price: new Money(4950, new Currency('EUR')),
+                isVerified: true,
+                verifiedBy: new Admin('AdminUser')
             );
 
-        $marketplaceService->setListingToSell($originalListing);
 
+
+        $mockedListingRepository = $this->createMock(ListingRepository::class);
+                $mockedListingRepository->method('findAll')
+            ->willReturn([$originalListing]);
+        $mockedListingRepository->method('findAllVerified')
+            ->willReturn([$originalListing]);
+
+        $marketplace = new Marketplace(listingsForSale: []);
+        $marketplaceService = new MarketPlaceService(
+            $marketplace, new ListingService($mockedListingRepository)
+        );
+
+
+        $marketplaceService->setListingToSell($originalListing);
+        
         $boughtTicket = $marketplaceService->buyTicket(
             buyer: new Buyer('Sarah'),
             ticketId: new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B')
@@ -305,6 +414,8 @@ class MarketPlaceServiceTest extends TestCase
                     ),
                 ],
                 price: new Money(5500, new Currency('EUR')),
+                isVerified: true,
+                verifiedBy: new Admin('AdminUser')
             );
 
         $marketplaceService->setListingToSell($resaleListing);

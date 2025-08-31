@@ -13,7 +13,9 @@ final class Listing
         private ListingId $id,
         private Seller $seller,
         private array $tickets,
-        private Money $price
+        private Money $price,
+        private bool $isVerified = false,
+        private ?Admin $verifiedBy = null
     ) {
     }
 
@@ -58,5 +60,21 @@ final class Listing
     public function getPrice() : Money
     {
         return $this->price;
+    }
+
+    public function isVerified(): bool
+    {
+        return $this->isVerified;
+    }
+
+    public function getVerifiedBy(): ?Admin
+    {
+        return $this->verifiedBy;
+    }
+
+    public function verifyListing(Admin $admin): void
+    {
+        $this->isVerified = true;
+        $this->verifiedBy = $admin;
     }
 }

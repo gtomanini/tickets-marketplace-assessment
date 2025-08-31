@@ -9,6 +9,7 @@ use TicketSwap\Assessment\Entity\ListingId;
 use TicketSwap\Assessment\Exception\ListingCreationException;
 use Money\Money;
 use Ramsey\Uuid\Uuid;
+use TicketSwap\Assessment\Entity\Admin;
 use TicketSwap\Assessment\Entity\Barcode;
 use TicketSwap\Assessment\Entity\Buyer;
 use TicketSwap\Assessment\Repository\ListingRepository;
@@ -27,6 +28,45 @@ final class ListingService {
     public function findAll(): array
     {
         return $this->listingRepository->findAll();
+    }
+
+    /**
+     * Retrieves all verified listings.
+     *
+     * @return array<Listing> an array of all verified listings
+     */
+    public function getAllVerifiedListings(): array
+    {
+        return $this->listingRepository->findAllVerified();
+    }
+
+    /**
+     * Retrieves a listing by its ID.
+     *
+     * @param ListingId $id the ID of the listing to retrieve
+     * @return Listing|null the listing if found, null otherwise
+     */
+    public function getListingById(ListingId $id): ?Listing
+    {
+        $allListings = $this->listingRepository->findAll();
+        foreach ($allListings as $listing) {
+            if ($listing->getId() == $id) {
+                return $listing;
+            }
+        }
+        return null;
+    }
+
+    /**
+     * Updates an existing listing.
+     *
+     * @param Listing $listing the listing to update
+     * @return void
+     */
+    public function updateListing(Listing $listing): void
+    {
+        $this->listingRepository->update($listing);
+
     }
 
     /**
@@ -134,5 +174,17 @@ final class ListingService {
             return false;
         }
         return $seller == $buyer;
+    }
+
+    /**
+     * Verifies a listing by an admin.
+     *
+     * @param Listing $listing the listing to be verified
+     * @param Admin $admin the admin performing the verification
+     * @return void
+     */
+    public function verifyListing(Listing $listing, Admin $admin): void
+    {
+        $listing->verifyListing($admin);
     }
 }

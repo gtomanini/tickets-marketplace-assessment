@@ -29,6 +29,35 @@ class ListingRepository
     }
 
     /**
+     * @param Listing $listing listing to be updated
+     * @return void
+     */
+    public function update(Listing $listing): void
+    {
+        foreach ($this->listings as $key => $existingListing) {
+            if ($existingListing->getId() === $listing->getId()) {
+                $this->listings[$key] = $listing;
+                return;
+            }
+        }
+    }
+
+    /**
+     * @return array<Listing> all verified listings
+     */
+    public function findAllVerified(): array
+    {
+        $verifiedListings = array_filter(
+            $this->listings,
+            function (Listing $listing): bool {
+                return $listing->isVerified();
+            }
+        );
+
+        return array_values($verifiedListings);
+    }
+
+    /**
      * @param string $barcode barcode to search for
      * @return Ticket|null returns the listing if found, null otherwise
      */

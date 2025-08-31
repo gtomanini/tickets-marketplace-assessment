@@ -5,6 +5,7 @@ namespace TicketSwap\Assessment\tests\Service;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use TicketSwap\Assessment\Entity\Admin;
 use TicketSwap\Assessment\Entity\Barcode;
 use TicketSwap\Assessment\Entity\Listing;
 use TicketSwap\Assessment\Entity\Seller;
@@ -102,4 +103,40 @@ class ListingServiceTest extends TestCase
             price: new Money(300, new Currency('EUR'))
         );
     }
+
+    /**
+     * @test
+     */
+    public function it_should_be_possible_to_verify_a_listing(): void
+    {
+        $listingRepository = new ListingRepository();
+        $listingService = new ListingService($listingRepository);
+
+        $createdListing = $listingService->createListing(
+            seller: new Seller('Pascal'),
+            tickets: [
+                new Ticket(
+                    new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
+                    new Barcode('EAN-13', '38974312923')
+                ),
+            ],
+            price: new Money(4950, new Currency('EUR'))
+        );
+
+        $this->assertFalse($createdListing->isVerified());
+
+        $allVerifiedListings = $listingRepository->findAllVerified();
+
+        $this->assertCount(0, $allVerifiedListings);
+
+        $createdListing->verifyListing(new Admin('AdminUser'));
+
+        $listingService->updateListing($createdListing);
+
+        $allVerifiedListings = $listingRepository->findAllVerified();
+
+        $this->assertCount(1, $allVerifiedListings);
+        $this->assertTrue($allVerifiedListings[0]->isVerified());
+    }
+        
 }
