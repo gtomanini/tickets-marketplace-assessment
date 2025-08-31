@@ -41,23 +41,6 @@ final class ListingService {
     }
 
     /**
-     * Retrieves a listing by its ID.
-     *
-     * @param ListingId $id the ID of the listing to retrieve
-     * @return Listing|null the listing if found, null otherwise
-     */
-    public function getListingById(ListingId $id): ?Listing
-    {
-        $allListings = $this->listingRepository->findAll();
-        foreach ($allListings as $listing) {
-            if ($listing->getId() == $id) {
-                return $listing;
-            }
-        }
-        return null;
-    }
-
-    /**
      * Updates an existing listing.
      *
      * @param Listing $listing the listing to update
