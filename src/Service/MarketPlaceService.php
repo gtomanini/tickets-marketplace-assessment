@@ -59,10 +59,11 @@ final class MarketPlaceService
      */
     public function buyTicket(Buyer $buyer, TicketId $ticketId) : Ticket
     {
-        foreach($this->marketplace->getListingsForSale() as $listing) {
+        foreach($this->listingService->findAll() as $listing) {
             foreach($listing->getTickets() as $ticket) {
                 if ($ticket->getId()->equals($ticketId) && !$ticket->isBought()) {
                    return $ticket->buyTicket($buyer); 
+                
                 }
             }
         }

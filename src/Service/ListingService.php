@@ -9,6 +9,8 @@ use TicketSwap\Assessment\Entity\ListingId;
 use TicketSwap\Assessment\Exception\ListingCreationException;
 use Money\Money;
 use Ramsey\Uuid\Uuid;
+use TicketSwap\Assessment\Entity\Barcode;
+use TicketSwap\Assessment\Entity\Buyer;
 use TicketSwap\Assessment\Repository\ListingRepository;
 
 final class ListingService {
@@ -47,7 +49,7 @@ final class ListingService {
         }
 
         $this->checkForDuplicateBarcodeOnListing($tickets);
-        $this->checkForDuplicatedBarcodeOnMarketplace($tickets);
+        $this->checkForDuplicatedBarcodeOnMarketplace($tickets, $seller);
 
         try {
             $listing = new Listing(
@@ -93,10 +95,14 @@ final class ListingService {
      * @param array $tickets
      * @throws ListingCreationException if any ticket's barcode is already for sale.
      */
-    private function checkForDuplicatedBarcodeOnMarketplace(array $tickets): void
+    private function checkForDuplicatedBarcodeOnMarketplace(array $tickets, Seller $seller): void
     {
         foreach ($tickets as $ticket) {
             if ($this->isBarcodeAlreadyForSale($ticket->getBarcode())) {
+                $createdTicket = $this->listingRepository->findTicketByBarcode($ticket->getBarcode());
+                if( $createdTicket->isBought() && $this->isSellerTheLastBuyer($seller, $createdTicket->getBuyer()) ) {
+                    continue;
+                }
                 throw ListingCreationException::withReason(
                     sprintf('Ticket with barcode %s is already for sale.', $ticket->getBarcode())
                 );
@@ -110,14 +116,23 @@ final class ListingService {
      * @param string $barcode
      * @return bool true if the barcode is already for sale, false otherwise.
      */
-    private function isBarcodeAlreadyForSale($barcode): bool
+    private function isBarcodeAlreadyForSale(Barcode $barcode): bool
     {
-        $isTicketAlreadyForSale = $this->listingRepository->findTicketByBarcode($barcode);
-
-        if( $isTicketAlreadyForSale !== null ) {
-            return true;
-        }
-        return false;
+        $existingTicket = $this->listingRepository->findTicketByBarcode($barcode);
+        return $existingTicket !== null;
     }
 
+    /**
+     * Check if the Seller of the ticket is the last Buyer
+     * @param Seller $seller 
+     * @param Buyer $buyer
+     * @return bool
+     */
+    private function isSellerTheLastBuyer(Seller $seller, Buyer $buyer): bool
+    {
+        if ($buyer === null) {
+            return false;
+        }
+        return $seller == $buyer;
+    }
 }
