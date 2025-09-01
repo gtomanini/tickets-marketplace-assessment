@@ -2,10 +2,14 @@
 
 namespace TicketSwap\Assessment\Entity;
 
+use TicketSwap\Assessment\Exception\TicketHasNoBarcodeException;
+
 final class Ticket
 {
-    public function __construct(private TicketId $id, private Barcode $barcode, private ?Buyer $buyer = null)
+    private array $barcodes = [];
+    public function __construct(private TicketId $id, array $barcodes, private ?Buyer $buyer = null)
     {
+        $this->barcodes[] = $barcodes;
     }
 
     public function getId() : TicketId
@@ -13,9 +17,9 @@ final class Ticket
         return $this->id;
     }
 
-    public function getBarcode() : Barcode
+    public function getBarcodes(): array
     {
-        return $this->barcode;
+        return $this->barcodes;
     }
 
     public function getBuyer() : Buyer

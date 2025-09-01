@@ -89,15 +89,16 @@ final class ListingService {
     {
         $barcodes = [];
         foreach ($tickets as $ticket) {
-            $barcodeValue = $ticket->getBarcode();
-
-            if (in_array($barcodeValue, $barcodes)) {
-                throw ListingCreationException::withReason(
-                    sprintf('Duplicate barcode found in the listing: %s', $barcodeValue)
-                );
+            foreach($ticket->getBarcodes() as $barcode) {
+                if (in_array($barcode[0], $barcodes)) {
+                    throw ListingCreationException::withReason(
+                        sprintf('Duplicate barcode found in the listing: %s', $barcode[0])
+                    );
+                }
+                $barcodes[] = $barcode[0];
             }
 
-            $barcodes[] = $barcodeValue;
+            
         }
     }
 
@@ -111,14 +112,16 @@ final class ListingService {
     private function checkForDuplicatedBarcodeOnMarketplace(array $tickets, Seller $seller): void
     {
         foreach ($tickets as $ticket) {
-            if ($this->isBarcodeAlreadyForSale($ticket->getBarcode())) {
-                $createdTicket = $this->listingRepository->findTicketByBarcode($ticket->getBarcode());
-                if( $createdTicket->isBought() && $this->isSellerTheLastBuyer($seller, $createdTicket->getBuyer()) ) {
-                    continue;
+            foreach($ticket->getBarcodes() as $barcode) {
+                if ($this->isBarcodeAlreadyForSale($barcode[0])) {
+                    $createdTicket = $this->listingRepository->findTicketByBarcode($barcode[0]);
+                    if( $createdTicket->isBought() && $this->isSellerTheLastBuyer($seller, $createdTicket->getBuyer()) ) {
+                        continue;
+                    }
+                    throw ListingCreationException::withReason(
+                        sprintf('Ticket with barcode %s is already for sale.', $barcode[0])
+                    );
                 }
-                throw ListingCreationException::withReason(
-                    sprintf('Ticket with barcode %s is already for sale.', $ticket->getBarcode())
-                );
             }
         }
     }

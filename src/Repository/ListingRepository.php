@@ -65,9 +65,12 @@ class ListingRepository
     {
         foreach ($this->listings as $listing) {
             foreach ($listing->getTickets() as $ticket) {
-                if ($ticket->getBarcode() === $barcode) {
-                    return $ticket;
+                foreach($ticket->getBarcodes() as $ticketBarcode) { 
+                    if ($ticketBarcode[0] === $barcode) {
+                        return $ticket;
+                    }
                 }
+                
             }
         }
 
