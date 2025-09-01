@@ -22,11 +22,7 @@ final class MarketPlaceService
      */
     public function setListingToSell(Listing $listing): void
     {
-        foreach ($listing->getTickets() as $ticket) {
-            // TODO implement to check if barcode is already for sale
-        }
-
-        $this->listingService->createListing($listing->getSeller(), $listing->getTickets(), $listing->getPrice());
+        $this->listingService->createListing($listing);
     }
 
     /**
