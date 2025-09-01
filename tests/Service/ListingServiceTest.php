@@ -5,9 +5,11 @@ namespace TicketSwap\Assessment\tests\Service;
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
+use Ramsey\Uuid\Nonstandard\Uuid;
 use TicketSwap\Assessment\Entity\Admin;
 use TicketSwap\Assessment\Entity\Barcode;
 use TicketSwap\Assessment\Entity\Listing;
+use TicketSwap\Assessment\Entity\ListingId;
 use TicketSwap\Assessment\Entity\Seller;
 use TicketSwap\Assessment\Entity\Ticket;
 use TicketSwap\Assessment\Entity\TicketId;
@@ -24,8 +26,9 @@ class ListingServiceTest extends TestCase
     public function it_should_be_possible_to_create_a_listing(): void
     {
         $listingService = new ListingService(new ListingRepository());
-        
-        $createdListing = $listingService->createListing(
+
+        $listing = new Listing(
+            id: new ListingId(Uuid::uuid4()->toString()),
             seller: new Seller('Pascal'),
             tickets: [
                 new Ticket(
@@ -34,6 +37,10 @@ class ListingServiceTest extends TestCase
                 ),
             ],
             price: new Money(4950, new Currency('EUR'))
+        );
+        
+        $createdListing = $listingService->createListing(
+            $listing
         );
         
         $this->assertInstanceOf(Listing::class, $createdListing);
@@ -49,10 +56,15 @@ class ListingServiceTest extends TestCase
 
         $listingService = new ListingService(new ListingRepository());
 
-        $listingService->createListing(
+        $listing = new Listing(
+            id: new ListingId(Uuid::uuid4()->toString()),
             seller: new Seller('Pascal'),
             tickets: [],
             price: new Money(4950, new Currency('EUR'))
+        );
+
+        $listingService->createListing(
+            $listing
         );
     }
 
@@ -66,8 +78,8 @@ class ListingServiceTest extends TestCase
 
         $listingService = new ListingService(new ListingRepository());
 
-        $listingService->createListing(
-            seller: new Seller('Pascal'),
+        $listing = new Listing(
+            id: new ListingId(Uuid::uuid4()->toString()),seller: new Seller('Pascal'),
             tickets: [
                 new Ticket(
                     new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B'),
@@ -75,6 +87,10 @@ class ListingServiceTest extends TestCase
                 ),
             ],
             price: new Money(-30, new Currency('EUR'))
+        );
+
+        $listingService->createListing(
+            $listing
         );
     }   
 
@@ -88,7 +104,8 @@ class ListingServiceTest extends TestCase
 
         $listingService = new ListingService(new ListingRepository());
 
-        $listingService->createListing(
+        $listing = new Listing(
+            id: new ListingId(Uuid::uuid4()->toString()),
             seller: new Seller('Pascal'),
             tickets: [
                 new Ticket(
@@ -102,6 +119,10 @@ class ListingServiceTest extends TestCase
             ],
             price: new Money(300, new Currency('EUR'))
         );
+
+        $listingService->createListing(
+            $listing
+        );
     }
 
     /**
@@ -112,7 +133,8 @@ class ListingServiceTest extends TestCase
         $listingRepository = new ListingRepository();
         $listingService = new ListingService($listingRepository);
 
-        $createdListing = $listingService->createListing(
+        $listing = new Listing(
+            id: new ListingId(Uuid::uuid4()->toString()),
             seller: new Seller('Pascal'),
             tickets: [
                 new Ticket(
@@ -121,6 +143,10 @@ class ListingServiceTest extends TestCase
                 ),
             ],
             price: new Money(4950, new Currency('EUR'))
+        );
+
+        $createdListing = $listingService->createListing(
+            $listing
         );
 
         $this->assertFalse($createdListing->isVerified());
