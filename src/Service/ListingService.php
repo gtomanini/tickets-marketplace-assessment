@@ -25,7 +25,7 @@ final class ListingService {
      */
     public function findAll(): array
     {
-        return $this->listingRepository->findAll();
+        return $this->filterOnlyListingWithTickets($this->listingRepository->findAll());
     }
 
     /**
@@ -35,7 +35,7 @@ final class ListingService {
      */
     public function getAllVerifiedListings(): array
     {
-        return $this->listingRepository->findAllVerified();
+        return $this->filterOnlyListingWithTickets($this->listingRepository->findAllVerified());
     }
 
     /**
@@ -159,5 +159,19 @@ final class ListingService {
     public function verifyListing(Listing $listing, Admin $admin): void
     {
         $listing->verifyListing($admin);
+    }
+
+    /**
+     * @param array<Listing> $listings list of listings to filter
+     * @return array<Listing> only listings with tickets
+     */
+    private function filterOnlyListingWithTickets(array $listings): array
+    {
+        return array_values(array_filter(
+            $listings,
+            function (Listing $listing): bool {
+                return count($listing->getTickets()) > 0;
+            }
+        ));
     }
 }

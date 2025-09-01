@@ -31,9 +31,7 @@ final class MarketPlaceService
      */
     public function getListingsForSale() : ?array
     {
-        return $this->filterOnlyListingWithTickets(
-            $this->listingService->findAll()
-        );
+        return $this->listingService->findAll();
     }
 
     /**
@@ -42,23 +40,7 @@ final class MarketPlaceService
      */
     public function getVerifiedListingsForSale() : ?array
     {
-        return $this->filterOnlyListingWithTickets(
-            $this->listingService->getAllVerifiedListings()
-        );
-    }
-
-    /**
-     * @param array<Listing> $listings
-     * @return array<Listing> only listings with tickets
-     */
-    private function filterOnlyListingWithTickets(array $listings): array
-    {
-        return array_values(array_filter(
-            $listings,
-            function (Listing $listing): bool {
-                return count($listing->getTickets()) > 0;
-            }
-        ));
+        return $this->listingService->getAllVerifiedListings();
     }
 
     /**
