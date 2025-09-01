@@ -9,6 +9,8 @@ use TicketSwap\Assessment\Entity\Ticket;
 
 class ListingRepository
 {
+
+    /** @var Listing[] */
     private array $listings = [];
 
     /**
@@ -58,7 +60,7 @@ class ListingRepository
     }
 
     /**
-     * @param string $barcode barcode to search for
+     * @param Barcode $barcode barcode to search for
      * @return Ticket|null returns the listing if found, null otherwise
      */
     public function findTicketByBarcode(Barcode $barcode): ?Ticket
@@ -66,7 +68,7 @@ class ListingRepository
         foreach ($this->listings as $listing) {
             foreach ($listing->getTickets() as $ticket) {
                 foreach($ticket->getBarcodes() as $ticketBarcode) { 
-                    if ($ticketBarcode[0] === $barcode) {
+                    if ($ticketBarcode === $barcode) {
                         return $ticket;
                     }
                 }

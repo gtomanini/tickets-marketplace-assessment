@@ -109,7 +109,6 @@ class MarketPlaceServiceTest extends TestCase
 
         $listingsForSale = $marketplaceService->getVerifiedListingsForSale();
 
-        $this->assertNotNull($listingsForSale);
         $this->assertCount(1, $listingsForSale);
         $this->assertCount(1, $listingsForSale);
         $this->assertSame($verifiedListing, $listingsForSale[0]);

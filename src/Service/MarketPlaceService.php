@@ -12,6 +12,7 @@ use TicketSwap\Assessment\Exception\TicketAlreadySoldException;
 
 final class MarketPlaceService
 {
+
     public function __construct(private Marketplace $marketplace, private ListingService $listingService)
     {
     }
@@ -27,18 +28,16 @@ final class MarketPlaceService
 
     /**
      * @return array<Listing>
-     * @return null if no listings are available for sale
      */
-    public function getListingsForSale() : ?array
+    public function getListingsForSale() : array
     {
         return $this->listingService->findAll();
     }
 
     /**
      * @return array<Listing>
-     * @return null if no listings are available for sale
      */
-    public function getVerifiedListingsForSale() : ?array
+    public function getVerifiedListingsForSale() : array
     {
         return $this->listingService->getAllVerifiedListings();
     }

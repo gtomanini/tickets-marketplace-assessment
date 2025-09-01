@@ -6,10 +6,10 @@ namespace TicketSwap\Assessment\Service;
 use TicketSwap\Assessment\Entity\Listing;
 use TicketSwap\Assessment\Entity\Seller;
 use TicketSwap\Assessment\Exception\ListingCreationException;
-use Money\Money;
 use TicketSwap\Assessment\Entity\Admin;
 use TicketSwap\Assessment\Entity\Barcode;
 use TicketSwap\Assessment\Entity\Buyer;
+use TicketSwap\Assessment\Entity\Ticket;
 use TicketSwap\Assessment\Repository\ListingRepository;
 
 final class ListingService {
@@ -82,7 +82,7 @@ final class ListingService {
     /**
      * Search for duplicate barcodes in the provided tickets array.
      *
-     * @param array $tickets
+     * @param array<Ticket> $tickets
      * @throws ListingCreationException if duplicates are found.
      */
     private function checkForDuplicateBarcodeOnListing(array $tickets): void
@@ -90,12 +90,12 @@ final class ListingService {
         $barcodes = [];
         foreach ($tickets as $ticket) {
             foreach($ticket->getBarcodes() as $barcode) {
-                if (in_array($barcode[0], $barcodes)) {
+                if (in_array($barcode, $barcodes)) {
                     throw ListingCreationException::withReason(
-                        sprintf('Duplicate barcode found in the listing: %s', $barcode[0])
+                        sprintf('Duplicate barcode found in the listing: %s', $barcode)
                     );
                 }
-                $barcodes[] = $barcode[0];
+                $barcodes[] = $barcode;
             }
 
             
@@ -106,20 +106,26 @@ final class ListingService {
     /**     
      * Check if any of the tickets' barcodes are already listed in the marketplace.
      *
-     * @param array $tickets
+     * @param array<Ticket> $tickets
+     * @param Seller $seller
      * @throws ListingCreationException if any ticket's barcode is already for sale.
      */
     private function checkForDuplicatedBarcodeOnMarketplace(array $tickets, Seller $seller): void
     {
         foreach ($tickets as $ticket) {
             foreach($ticket->getBarcodes() as $barcode) {
-                if ($this->isBarcodeAlreadyForSale($barcode[0])) {
-                    $createdTicket = $this->listingRepository->findTicketByBarcode($barcode[0]);
-                    if( $createdTicket->isBought() && $this->isSellerTheLastBuyer($seller, $createdTicket->getBuyer()) ) {
-                        continue;
+                if ($this->isBarcodeAlreadyForSale($barcode)) {
+                    $createdTicket = $this->listingRepository->findTicketByBarcode($barcode);
+                    if ($createdTicket !== null) {
+                        if ($createdTicket->isBought() && $this->isSellerTheLastBuyer($seller, $createdTicket->getBuyer())) {
+                            continue;
+                        }
                     }
+                    // if( $createdTicket->isBought() && $this->isSellerTheLastBuyer($seller, $createdTicket->getBuyer()) ) {
+                    //     continue;
+                    // }
                     throw ListingCreationException::withReason(
-                        sprintf('Ticket with barcode %s is already for sale.', $barcode[0])
+                        sprintf('Ticket with barcode %s is already for sale.', $barcode)
                     );
                 }
             }
@@ -129,7 +135,7 @@ final class ListingService {
     /**
      * Check if a barcode is already listed for sale in the marketplace.
      *
-     * @param string $barcode
+     * @param Barcode $barcode
      * @return bool true if the barcode is already for sale, false otherwise.
      */
     private function isBarcodeAlreadyForSale(Barcode $barcode): bool
@@ -144,9 +150,9 @@ final class ListingService {
      * @param Buyer $buyer
      * @return bool
      */
-    private function isSellerTheLastBuyer(Seller $seller, Buyer $buyer): bool
+    private function isSellerTheLastBuyer(Seller $seller, ?Buyer $buyer): bool
     {
-        if ($buyer === null) {
+        if ($buyer == null) {
             return false;
         }
         return $seller == $buyer;
