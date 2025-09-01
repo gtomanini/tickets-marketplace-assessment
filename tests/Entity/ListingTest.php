@@ -18,7 +18,7 @@ class ListingTest extends TestCase
     /**
      * @test
     */
-    public function it_should_list_the_tickets_for_sale()
+    public function it_should_list_the_tickets_for_sale(): void
     {
         $listing = new Listing(
             id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
@@ -50,7 +50,7 @@ class ListingTest extends TestCase
     /**
      * @test
     */
-    public function it_should_list_the_tickets_not_for_sale()
+    public function it_should_list_the_tickets_not_for_sale(): void
     {
         $listing = new Listing(
             id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),

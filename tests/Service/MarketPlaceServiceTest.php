@@ -27,7 +27,7 @@ class MarketPlaceServiceTest extends TestCase
     /**
      * @test
      */
-    public function it_should_list_all_the_tickets_for_sale()
+    public function it_should_list_all_the_tickets_for_sale(): void
     {
         $listing = new Listing(
                                 id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
@@ -53,13 +53,15 @@ class MarketPlaceServiceTest extends TestCase
 
         $listingsForSale = $marketplaceService->getListingsForSale();
 
+        $this->assertNotEmpty($listingsForSale);
+        $this->assertCount(1, $listingsForSale);
         $this->assertSame($listing->getTickets(), $listingsForSale[0]->getTickets());
     }
 
     /**
      * @test
      */
-    public function it_should_list_only_verified_listings_for_sale()
+    public function it_should_list_only_verified_listings_for_sale(): void
     {
         $verifiedListing = new Listing(
                                 id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
@@ -107,6 +109,8 @@ class MarketPlaceServiceTest extends TestCase
 
         $listingsForSale = $marketplaceService->getVerifiedListingsForSale();
 
+        $this->assertNotNull($listingsForSale);
+        $this->assertCount(1, $listingsForSale);
         $this->assertCount(1, $listingsForSale);
         $this->assertSame($verifiedListing, $listingsForSale[0]);
     }
@@ -115,7 +119,7 @@ class MarketPlaceServiceTest extends TestCase
     /**
      * @test
      */
-    public function it_should_be_possible_to_buy_a_ticket_from_a_verified_list()
+    public function it_should_be_possible_to_buy_a_ticket_from_a_verified_list(): void
     {
         $listingWithTicket = new Listing(
                     id: new ListingId('D59FDCCC-7713-45EE-A050-8A553A0F1169'),
@@ -152,15 +156,13 @@ class MarketPlaceServiceTest extends TestCase
             ticketId: new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B')
         );
 
-        $this->assertNotNull($boughtTicket);
-        // TODO fix this test after changing getBarcode to getBarcodes
-        // $this->assertSame('EAN-13:38974312923', (string) $boughtTicket->getBarcode());
+        $this->assertInstanceOf(Ticket::class, $boughtTicket);
     }
 
     /**
      * @test
      */
-    public function it_should_not_be_possible_to_buy_a_ticket_from_an_unverified_list()
+    public function it_should_not_be_possible_to_buy_a_ticket_from_an_unverified_list(): void
     {
         $this->expectException(ListingNotVerifiedException::class);
         $this->expectExceptionMessage('Cannot buy ticket from unverified listing.');
@@ -197,9 +199,7 @@ class MarketPlaceServiceTest extends TestCase
             ticketId: new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401B')
         );
 
-        $this->assertNotNull($boughtTicket);
-        // TODO fix this test after changing getBarcode to getBarcodes
-        // $this->assertSame('EAN-13:38974312923', (string) $boughtTicket->getBarcode());
+        $this->assertInstanceOf(Ticket::class, $boughtTicket);
     }
 
     /**
@@ -242,7 +242,6 @@ class MarketPlaceServiceTest extends TestCase
         
         $listingsForSale = $marketplaceService->getListingsForSale();
 
-        $this->assertNotNull($listingsForSale);
         $this->assertCount(1, $listingsForSale);
         $this->assertSame($listingWithTicket, $listingsForSale[0]);
     }
@@ -251,7 +250,7 @@ class MarketPlaceServiceTest extends TestCase
     /**
      * @test
      */
-    public function it_should_not_be_possible_to_buy_the_same_ticket_twice()
+    public function it_should_not_be_possible_to_buy_the_same_ticket_twice(): void
     {
         $this->expectException(TicketAlreadySoldException::class);
 
@@ -291,7 +290,7 @@ class MarketPlaceServiceTest extends TestCase
     /**
      * @test
      */
-    public function it_should_be_possible_to_put_a_listing_for_sale()
+    public function it_should_be_possible_to_put_a_listing_for_sale(): void
     {
         $listing = new Listing(
                 id: new ListingId('26A7E5C4-3F59-4B3C-B5EB-6F2718BC31AD'),
@@ -327,7 +326,7 @@ class MarketPlaceServiceTest extends TestCase
     /**
      * @test
      */
-    public function it_should_not_be_possible_to_sell_a_ticket_with_a_barcode_that_is_already_for_sale()
+    public function it_should_not_be_possible_to_sell_a_ticket_with_a_barcode_that_is_already_for_sale(): void
     {
         $this->expectException(ListingCreationException::class);
         $this->expectExceptionMessage('Ticket with barcode EAN-13:38974312923 is already for sale.');
@@ -370,7 +369,9 @@ class MarketPlaceServiceTest extends TestCase
                 tickets: [
                     new Ticket(
                         new TicketId('45B96761-E533-4925-859F-3CA62182848E'),
+                        [
                         new Barcode('EAN-13', '38974312923')
+                        ]
                     ),
                 ],
                 price: new Money(4950, new Currency('EUR')),
@@ -384,7 +385,7 @@ class MarketPlaceServiceTest extends TestCase
     /**
      * @test
      */
-    public function it_should_be_possible_for_a_buyer_of_a_ticket_to_sell_it_again()
+    public function it_should_be_possible_for_a_buyer_of_a_ticket_to_sell_it_again(): void
     {
 
         $originalListing = new Listing(
@@ -446,7 +447,6 @@ class MarketPlaceServiceTest extends TestCase
 
         $listingsForSale = $marketplaceService->getListingsForSale();
 
-        $this->assertNotNull($listingsForSale);
         $this->assertGreaterThanOrEqual(1, count($listingsForSale));
     }
 
