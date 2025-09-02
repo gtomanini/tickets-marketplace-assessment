@@ -19,16 +19,6 @@ final class ListingService {
     }
 
     /**
-     * Retrieves all listings.
-     *
-     * @return array<Listing> an array of all listings
-     */
-    public function findAll(): array
-    {
-        return $this->listingRepository->findAllVerifiedAndWithTickets();
-    }
-
-    /**
      * Retrieves all verified listings.
      *
      * @return array<Listing> an array of all verified listings
