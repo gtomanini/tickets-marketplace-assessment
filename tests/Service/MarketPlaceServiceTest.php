@@ -420,7 +420,7 @@ class MarketPlaceServiceTest extends TestCase
         $mockedListingRepository = $this->createMock(ListingRepository::class);
                 $mockedListingRepository->method('findAll')
             ->willReturn([$originalListing]);
-        $mockedListingRepository->method('findAllVerified')
+        $mockedListingRepository->method('findAllVerifiedAndWithTickets')
             ->willReturn([$originalListing]);
 
         $marketplace = new Marketplace(listingsForSale: []);
@@ -456,7 +456,7 @@ class MarketPlaceServiceTest extends TestCase
 
         $marketplaceService->setListingToSell($resaleListing);
 
-        $listingsForSale = $marketplaceService->getListingsForSale();
+        $listingsForSale = $marketplaceService->getOnlyVerifiedAndWithTicketsListingsForSale();
 
         $this->assertGreaterThanOrEqual(1, count($listingsForSale));
     }
