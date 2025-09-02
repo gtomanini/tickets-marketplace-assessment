@@ -17,7 +17,7 @@ use TicketSwap\Assessment\Entity\TicketId;
 use TicketSwap\Assessment\Exception\ListingCreationException;
 use TicketSwap\Assessment\Exception\ListingNotVerifiedException;
 use TicketSwap\Assessment\Exception\TicketAlreadySoldException;
-use TicketSwap\Assessment\Repository\ListingRepository;
+use TicketSwap\Assessment\Repository\InMemoryListingRepository;
 use TicketSwap\Assessment\Service\ListingService;
 use TicketSwap\Assessment\Service\MarketPlaceService;
 
@@ -45,8 +45,10 @@ class MarketPlaceServiceTest extends TestCase
         
         $marketplace = new Marketplace(listingsForSale: []);
 
+        $inMemoryListingRepository = new InMemoryListingRepository();
+        $listingService = new ListingService($inMemoryListingRepository);
         $marketplaceService = new MarketPlaceService(
-            $marketplace, new ListingService(new ListingRepository())
+            $marketplace, $listingService
         );
 
         $marketplaceService->setListingToSell($listing);
@@ -96,7 +98,7 @@ class MarketPlaceServiceTest extends TestCase
 
         $marketplace = new Marketplace(listingsForSale: []);
 
-        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository = $this->createMock(InMemoryListingRepository::class);
         $mockedListingRepository->method('findAllVerifiedAndWithTickets')
             ->willReturn([$verifiedListing]);
 
@@ -142,7 +144,7 @@ class MarketPlaceServiceTest extends TestCase
             ]
         );
 
-        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository = $this->createMock(InMemoryListingRepository::class);
         $mockedListingRepository->method('findAll')
             ->willReturn([$listingWithTicket]);
 
@@ -185,7 +187,7 @@ class MarketPlaceServiceTest extends TestCase
             ]
         );
 
-        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository = $this->createMock(InMemoryListingRepository::class);
         $mockedListingRepository->method('findAll')
             ->willReturn([$listingWithTicket]);
 
@@ -240,7 +242,7 @@ class MarketPlaceServiceTest extends TestCase
             listingsForSale: []
         );
         
-        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository = $this->createMock(InMemoryListingRepository::class);
         $mockedListingRepository->method('findAllVerifiedAndWithTickets')
             ->willReturn([$listingWithTicket]);
 
@@ -287,9 +289,11 @@ class MarketPlaceServiceTest extends TestCase
         );
 
 
+        $inMemoryListingRepository = new InMemoryListingRepository();
+        $listingService = new ListingService($inMemoryListingRepository);
         $marketplaceService = new MarketPlaceService(
             $marketplace,
-            new ListingService(new ListingRepository())
+            $listingService
         );
 
         $marketplaceService->buyTicket(
@@ -321,8 +325,10 @@ class MarketPlaceServiceTest extends TestCase
             listingsForSale: []
         );
 
+        $inMemoryListingRepository = new InMemoryListingRepository();
+        $listingService = new ListingService($inMemoryListingRepository);
         $marketplaceService = new MarketPlaceService(
-            $marketplace, new ListingService(new ListingRepository())
+            $marketplace, $listingService
         );
 
         $marketplaceService->setListingToSell(
@@ -358,7 +364,7 @@ class MarketPlaceServiceTest extends TestCase
                 price: new Money(4950, new Currency('EUR')),
             );
 
-        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository = $this->createMock(InMemoryListingRepository::class);
         $mockedListingRepository->method('findTicketByBarcode')
             ->willReturn($existingTicket);
 
@@ -417,7 +423,7 @@ class MarketPlaceServiceTest extends TestCase
 
 
 
-        $mockedListingRepository = $this->createMock(ListingRepository::class);
+        $mockedListingRepository = $this->createMock(InMemoryListingRepository::class);
                 $mockedListingRepository->method('findAll')
             ->willReturn([$originalListing]);
         $mockedListingRepository->method('findAllVerifiedAndWithTickets')

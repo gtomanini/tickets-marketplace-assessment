@@ -14,7 +14,7 @@ use TicketSwap\Assessment\Entity\Seller;
 use TicketSwap\Assessment\Entity\Ticket;
 use TicketSwap\Assessment\Entity\TicketId;
 use TicketSwap\Assessment\Exception\ListingCreationException;
-use TicketSwap\Assessment\Repository\ListingRepository;
+use TicketSwap\Assessment\Repository\InMemoryListingRepository;
 use TicketSwap\Assessment\Service\ListingService;
 
 class ListingServiceTest extends TestCase
@@ -25,7 +25,8 @@ class ListingServiceTest extends TestCase
     */
     public function it_should_be_possible_to_create_a_listing(): void
     {
-        $listingService = new ListingService(new ListingRepository());
+        $inMemoryListingRepository = new InMemoryListingRepository();
+        $listingService = new ListingService($inMemoryListingRepository);
 
         $listing = new Listing(
             id: new ListingId(Uuid::uuid4()->toString()),
@@ -56,7 +57,8 @@ class ListingServiceTest extends TestCase
         $this->expectException(ListingCreationException::class);
         $this->expectExceptionMessage('A listing cannot be created without tickets.');
 
-        $listingService = new ListingService(new ListingRepository());
+        $inMemoryListingRepository = new InMemoryListingRepository();
+        $listingService = new ListingService($inMemoryListingRepository);
 
         $listing = new Listing(
             id: new ListingId(Uuid::uuid4()->toString()),
@@ -78,7 +80,8 @@ class ListingServiceTest extends TestCase
         $this->expectException(ListingCreationException::class);
         $this->expectExceptionMessage('The listing price must be greater than zero.');
 
-        $listingService = new ListingService(new ListingRepository());
+        $inMemoryListingRepository = new InMemoryListingRepository();
+        $listingService = new ListingService($inMemoryListingRepository);
 
         $listing = new Listing(
             id: new ListingId(Uuid::uuid4()->toString()),seller: new Seller('Pascal'),
@@ -106,7 +109,8 @@ class ListingServiceTest extends TestCase
         $this->expectException(ListingCreationException::class);
         $this->expectExceptionMessage('Duplicate barcode found in the listing: EAN-13:38974312923');
 
-        $listingService = new ListingService(new ListingRepository());
+        $inMemoryListingRepository = new InMemoryListingRepository();
+        $listingService = new ListingService($inMemoryListingRepository);
 
         $listing = new Listing(
             id: new ListingId(Uuid::uuid4()->toString()),
@@ -138,8 +142,8 @@ class ListingServiceTest extends TestCase
      */
     public function it_should_be_possible_to_verify_a_listing(): void
     {
-        $listingRepository = new ListingRepository();
-        $listingService = new ListingService($listingRepository);
+        $inMemoryListingRepository = new InMemoryListingRepository();
+        $listingService = new ListingService($inMemoryListingRepository);
 
         $listing = new Listing(
             id: new ListingId(Uuid::uuid4()->toString()),
@@ -161,7 +165,7 @@ class ListingServiceTest extends TestCase
 
         $this->assertFalse($createdListing->isVerified());
 
-        $allVerifiedListings = $listingRepository->findAllVerified();
+        $allVerifiedListings = $inMemoryListingRepository->findAllVerified();
 
         $this->assertCount(0, $allVerifiedListings);
 
@@ -169,7 +173,7 @@ class ListingServiceTest extends TestCase
 
         $listingService->updateListing($createdListing);
 
-        $allVerifiedListings = $listingRepository->findAllVerified();
+        $allVerifiedListings = $inMemoryListingRepository->findAllVerified();
 
         $this->assertCount(1, $allVerifiedListings);
         $this->assertTrue($allVerifiedListings[0]->isVerified());

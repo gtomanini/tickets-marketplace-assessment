@@ -10,11 +10,11 @@ use TicketSwap\Assessment\Entity\Admin;
 use TicketSwap\Assessment\Entity\Barcode;
 use TicketSwap\Assessment\Entity\Buyer;
 use TicketSwap\Assessment\Entity\Ticket;
-use TicketSwap\Assessment\Repository\ListingRepository;
+use TicketSwap\Assessment\Interface\ListingRepositoryInterface;
 
 final class ListingService {
     
-    public function __construct(private ListingRepository $listingRepository) 
+    public function __construct(private ListingRepositoryInterface $listingRepository) 
     {
     }
 
@@ -111,9 +111,6 @@ final class ListingService {
                             continue;
                         }
                     }
-                    // if( $createdTicket->isBought() && $this->isSellerTheLastBuyer($seller, $createdTicket->getBuyer()) ) {
-                    //     continue;
-                    // }
                     throw ListingCreationException::withReason(
                         sprintf('Ticket with barcode %s is already for sale.', $barcode)
                     );

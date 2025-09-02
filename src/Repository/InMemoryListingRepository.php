@@ -1,15 +1,14 @@
 <?php
-declare(strict_types=1);
 
 namespace TicketSwap\Assessment\Repository;
 
 use TicketSwap\Assessment\Entity\Barcode;
 use TicketSwap\Assessment\Entity\Listing;
 use TicketSwap\Assessment\Entity\Ticket;
+use TicketSwap\Assessment\Interface\ListingRepositoryInterface;
 
-class ListingRepository
+class InMemoryListingRepository implements ListingRepositoryInterface
 {
-
     /** @var Listing[] */
     private array $listings = [];
 
@@ -30,7 +29,7 @@ class ListingRepository
         return $this->listings;
     }
 
-    /**
+        /**
      * @param Listing $listing listing to be updated
      * @return void
      */
@@ -93,5 +92,4 @@ class ListingRepository
 
         return array_values($verifiedListings);
     }
-    
 }
