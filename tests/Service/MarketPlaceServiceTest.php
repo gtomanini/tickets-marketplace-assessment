@@ -97,7 +97,7 @@ class MarketPlaceServiceTest extends TestCase
         $marketplace = new Marketplace(listingsForSale: []);
 
         $mockedListingRepository = $this->createMock(ListingRepository::class);
-        $mockedListingRepository->method('findAllVerified')
+        $mockedListingRepository->method('findAllVerifiedAndWithTickets')
             ->willReturn([$verifiedListing]);
 
         $marketplaceService = new MarketPlaceService(
@@ -107,7 +107,7 @@ class MarketPlaceServiceTest extends TestCase
         $marketplaceService->setListingToSell($verifiedListing);
         $marketplaceService->setListingToSell($unverifiedListing);
 
-        $listingsForSale = $marketplaceService->getVerifiedListingsForSale();
+        $listingsForSale = $marketplaceService->getOnlyVerifiedAndWithTicketsListingsForSale();
 
         $this->assertCount(1, $listingsForSale);
         $this->assertCount(1, $listingsForSale);
@@ -223,8 +223,17 @@ class MarketPlaceServiceTest extends TestCase
         $listingWithoutTicket = new Listing(
                     id: new ListingId('26A7E5C4-3F59-4B3C-B5EB-6F2718BC31AD'),
                     seller: new Seller('Tom'),
-                    tickets: [],
+                    tickets: [
+                        new Ticket(
+                            new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401C'),
+                            [
+                                new Barcode('EAN-13', '38974312923')
+                            ]
+                        )
+                    ],
                     price: new Money(4950, new Currency('EUR')),
+                    isVerified: true,
+                    verifiedBy: new Admin('adminUser')
         );
 
         $marketplace = new Marketplace(
@@ -232,14 +241,17 @@ class MarketPlaceServiceTest extends TestCase
         );
         
         $mockedListingRepository = $this->createMock(ListingRepository::class);
-        $mockedListingRepository->method('findAll')
-            ->willReturn([$listingWithTicket, $listingWithoutTicket]);
+        $mockedListingRepository->method('findAllVerifiedAndWithTickets')
+            ->willReturn([$listingWithTicket]);
 
         $marketplaceService = new MarketPlaceService(
             $marketplace, new ListingService($mockedListingRepository)
         );
+        $marketplaceService->setListingToSell($listingWithTicket);
+        $marketplaceService->setListingToSell($listingWithoutTicket);
+        $marketplaceService->buyTicket(new Buyer('buyerUser'), new TicketId('6293BB44-2F5F-4E2A-ACA8-8CDF01AF401C'));
         
-        $listingsForSale = $marketplaceService->getListingsForSale();
+        $listingsForSale = $marketplaceService->getOnlyVerifiedAndWithTicketsListingsForSale();
 
         $this->assertCount(1, $listingsForSale);
         $this->assertSame($listingWithTicket, $listingsForSale[0]);

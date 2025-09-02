@@ -78,5 +78,20 @@ class ListingRepository
 
         return null;
     }
+
+    /**
+     * @return array<Listing> all verified and with available tickets
+    */
+    public function findAllVerifiedAndWithTickets(): array
+    {
+        $verifiedListings = array_filter(
+            $this->listings,
+            function (Listing $listing): bool {
+                return $listing->isVerified() && count($listing->getTickets()) > 0;
+            }
+        );
+
+        return array_values($verifiedListings);
+    }
     
 }

@@ -24,6 +24,7 @@ final class MarketPlaceService
     public function setListingToSell(Listing $listing): void
     {
         $this->listingService->createListing($listing);
+        $this->marketplace->setListingForSale($listing);
     }
 
     /**
@@ -31,15 +32,15 @@ final class MarketPlaceService
      */
     public function getListingsForSale() : array
     {
-        return $this->listingService->findAll();
+        return $this->marketplace->getListingsForSale();
     }
 
     /**
      * @return array<Listing>
      */
-    public function getVerifiedListingsForSale() : array
+    public function getOnlyVerifiedAndWithTicketsListingsForSale() : array
     {
-        return $this->listingService->getAllVerifiedListings();
+        return $this->listingService->getOnlyVerifiedAndWithTicketsListings();
     }
 
     /**
@@ -51,7 +52,7 @@ final class MarketPlaceService
      */
     public function buyTicket(Buyer $buyer, TicketId $ticketId) : Ticket
     {
-        foreach($this->listingService->findAll() as $listing) {
+        foreach($this->marketplace->getListingsForSale() as $listing) {
             foreach($listing->getTickets() as $ticket) {
                 if ($ticket->getId()->equals($ticketId) && !$ticket->isBought()) {
                     if($listing->isVerified() === false) {
@@ -64,5 +65,4 @@ final class MarketPlaceService
         }
         throw new TicketAlreadySoldException();
     }
-
 }
