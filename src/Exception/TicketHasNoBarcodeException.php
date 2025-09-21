@@ -1,6 +1,6 @@
 <?php
 
-namespace TicketSwap\Assessment\Exception;
+namespace TicketsMarketplace\Assessment\Exception;
 
 use DomainException;
 

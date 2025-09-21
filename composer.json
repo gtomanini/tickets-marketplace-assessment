@@ -1,0 +1,30 @@
+{
+    "name": "tickets/backend-assessment",
+    "description": "tickets assessment",
+    "type": "project",
+    "require": {
+        "phpunit/phpunit": "^9.5",
+        "moneyphp/money": "^4.0",
+        "ramsey/uuid": "^4.9"
+    },
+    "authors": [
+        {
+            "name": "Gustavo Tomanini",
+            "email": "gustavo.tomanini@gmail.com"
+        }
+    ],
+    "minimum-stability": "stable",
+    "autoload": {
+        "psr-4": {
+            "TicketsMarketplace\\Assessment\\": "src",
+            "TicketsMarketplace\\Assessment\\tests\\": "tests"
+        }
+    },
+    "scripts": {
+        "test": "phpunit --colors=always",
+        "test-coverage": "phpunit --colors=always --coverage-html coverage-report"
+    },
+    "require-dev": {
+        "phpstan/phpstan": "^2.1"
+    }
+}

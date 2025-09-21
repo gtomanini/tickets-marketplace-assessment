@@ -1,17 +1,17 @@
 <?php
 
-namespace TicketSwap\Assessment\tests\Service;
+namespace TicketsMarketplace\Assessment\tests\Service;
 
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use TicketSwap\Assessment\Entity\Admin;
-use TicketSwap\Assessment\Entity\Barcode;
-use TicketSwap\Assessment\Entity\Listing;
-use TicketSwap\Assessment\Exception\ListingCreationException;
-use TicketSwap\Assessment\Repository\InMemoryListingRepository;
-use TicketSwap\Assessment\Service\ListingService;
-use TicketSwap\Assessment\tests\Helpers\TestEntityFactory;
+use TicketsMarketplace\Assessment\Entity\Admin;
+use TicketsMarketplace\Assessment\Entity\Barcode;
+use TicketsMarketplace\Assessment\Entity\Listing;
+use TicketsMarketplace\Assessment\Exception\ListingCreationException;
+use TicketsMarketplace\Assessment\Repository\InMemoryListingRepository;
+use TicketsMarketplace\Assessment\Service\ListingService;
+use TicketsMarketplace\Assessment\tests\Helpers\TestEntityFactory;
 
 class ListingServiceTest extends TestCase
 {

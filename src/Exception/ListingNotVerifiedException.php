@@ -1,9 +1,9 @@
 <?php
 
-namespace TicketSwap\Assessment\Exception;
+namespace TicketsMarketplace\Assessment\Exception;
 
 use DomainException;
-use TicketSwap\Assessment\Entity\Listing;
+use TicketsMarketplace\Assessment\Entity\Listing;
 
 final class ListingNotVerifiedException extends DomainException
 {

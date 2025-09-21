@@ -1,6 +1,6 @@
 <?php
 
-namespace TicketSwap\Assessment\Entity;
+namespace TicketsMarketplace\Assessment\Entity;
 
 final class ListingId implements \Stringable
 {

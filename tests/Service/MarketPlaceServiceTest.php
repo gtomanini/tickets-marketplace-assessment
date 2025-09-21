@@ -1,26 +1,26 @@
 <?php
 
-namespace TicketSwap\Assessment\tests\Service;
+namespace TicketsMarketplace\Assessment\tests\Service;
 
 use PHPUnit\Framework\TestCase;
 use Money\Currency;
 use Money\Money;
-use TicketSwap\Assessment\Entity\Admin;
-use TicketSwap\Assessment\Entity\Barcode;
-use TicketSwap\Assessment\Entity\Buyer;
-use TicketSwap\Assessment\Entity\Listing;
-use TicketSwap\Assessment\Entity\ListingId;
-use TicketSwap\Assessment\Entity\Marketplace;
-use TicketSwap\Assessment\Entity\Seller;
-use TicketSwap\Assessment\Entity\Ticket;
-use TicketSwap\Assessment\Entity\TicketId;
-use TicketSwap\Assessment\Exception\ListingCreationException;
-use TicketSwap\Assessment\Exception\ListingNotVerifiedException;
-use TicketSwap\Assessment\Exception\TicketAlreadySoldException;
-use TicketSwap\Assessment\Repository\InMemoryListingRepository;
-use TicketSwap\Assessment\Service\ListingService;
-use TicketSwap\Assessment\Service\MarketPlaceService;
-use TicketSwap\Assessment\tests\Helpers\TestEntityFactory;
+use TicketsMarketplace\Assessment\Entity\Admin;
+use TicketsMarketplace\Assessment\Entity\Barcode;
+use TicketsMarketplace\Assessment\Entity\Buyer;
+use TicketsMarketplace\Assessment\Entity\Listing;
+use TicketsMarketplace\Assessment\Entity\ListingId;
+use TicketsMarketplace\Assessment\Entity\Marketplace;
+use TicketsMarketplace\Assessment\Entity\Seller;
+use TicketsMarketplace\Assessment\Entity\Ticket;
+use TicketsMarketplace\Assessment\Entity\TicketId;
+use TicketsMarketplace\Assessment\Exception\ListingCreationException;
+use TicketsMarketplace\Assessment\Exception\ListingNotVerifiedException;
+use TicketsMarketplace\Assessment\Exception\TicketAlreadySoldException;
+use TicketsMarketplace\Assessment\Repository\InMemoryListingRepository;
+use TicketsMarketplace\Assessment\Service\ListingService;
+use TicketsMarketplace\Assessment\Service\MarketPlaceService;
+use TicketsMarketplace\Assessment\tests\Helpers\TestEntityFactory;
 
 
 class MarketPlaceServiceTest extends TestCase

@@ -1,11 +1,11 @@
 <?php
 
-namespace TicketSwap\Assessment\Repository;
+namespace TicketsMarketplace\Assessment\Repository;
 
-use TicketSwap\Assessment\Entity\Barcode;
-use TicketSwap\Assessment\Entity\Listing;
-use TicketSwap\Assessment\Entity\Ticket;
-use TicketSwap\Assessment\Interface\ListingRepositoryInterface;
+use TicketsMarketplace\Assessment\Entity\Barcode;
+use TicketsMarketplace\Assessment\Entity\Listing;
+use TicketsMarketplace\Assessment\Entity\Ticket;
+use TicketsMarketplace\Assessment\Interface\ListingRepositoryInterface;
 
 class InMemoryListingRepository implements ListingRepositoryInterface
 {

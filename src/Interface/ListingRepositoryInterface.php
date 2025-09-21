@@ -1,10 +1,10 @@
 <?php
 
-namespace TicketSwap\Assessment\Interface;
+namespace TicketsMarketplace\Assessment\Interface;
 
-use TicketSwap\Assessment\Entity\Barcode;
-use TicketSwap\Assessment\Entity\Listing;
-use TicketSwap\Assessment\Entity\Ticket;
+use TicketsMarketplace\Assessment\Entity\Barcode;
+use TicketsMarketplace\Assessment\Entity\Listing;
+use TicketsMarketplace\Assessment\Entity\Ticket;
 
 interface ListingRepositoryInterface
 {
@@ -17,7 +17,7 @@ interface ListingRepositoryInterface
     
     
     /**
-     * @param \TicketSwap\Assessment\Entity\Listing $listing listing to be updated
+     * @param \TicketsMarketplace\Assessment\Entity\Listing $listing listing to be updated
      * @return void
      */
     public function update(Listing $listing) : void;

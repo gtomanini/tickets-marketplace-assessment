@@ -1,17 +1,17 @@
 <?php
 
-namespace TicketSwap\Assessment\tests\Entity;
+namespace TicketsMarketplace\Assessment\tests\Entity;
 
 use Money\Currency;
 use Money\Money;
 use PHPUnit\Framework\TestCase;
-use TicketSwap\Assessment\Entity\Barcode;
-use TicketSwap\Assessment\Entity\Listing;
-use TicketSwap\Assessment\Entity\ListingId;
-use TicketSwap\Assessment\Entity\Marketplace;
-use TicketSwap\Assessment\Entity\Seller;
-use TicketSwap\Assessment\Entity\Ticket;
-use TicketSwap\Assessment\Entity\TicketId;
+use TicketsMarketplace\Assessment\Entity\Barcode;
+use TicketsMarketplace\Assessment\Entity\Listing;
+use TicketsMarketplace\Assessment\Entity\ListingId;
+use TicketsMarketplace\Assessment\Entity\Marketplace;
+use TicketsMarketplace\Assessment\Entity\Seller;
+use TicketsMarketplace\Assessment\Entity\Ticket;
+use TicketsMarketplace\Assessment\Entity\TicketId;
 
 class MarketplaceTest extends TestCase
 {

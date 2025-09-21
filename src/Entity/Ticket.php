@@ -1,8 +1,8 @@
 <?php
 
-namespace TicketSwap\Assessment\Entity;
+namespace TicketsMarketplace\Assessment\Entity;
 
-use TicketSwap\Assessment\Exception\TicketHasNoBarcodeException;
+use TicketsMarketplace\Assessment\Exception\TicketHasNoBarcodeException;
 
 final class Ticket
 {

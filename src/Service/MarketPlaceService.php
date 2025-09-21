@@ -1,14 +1,14 @@
 <?php
 
-namespace TicketSwap\Assessment\Service;
+namespace TicketsMarketplace\Assessment\Service;
 
-use TicketSwap\Assessment\Entity\Buyer;
-use TicketSwap\Assessment\Entity\Listing;
-use TicketSwap\Assessment\Entity\Marketplace;
-use TicketSwap\Assessment\Entity\Ticket;
-use TicketSwap\Assessment\Entity\TicketId;
-use TicketSwap\Assessment\Exception\ListingNotVerifiedException;
-use TicketSwap\Assessment\Exception\TicketAlreadySoldException;
+use TicketsMarketplace\Assessment\Entity\Buyer;
+use TicketsMarketplace\Assessment\Entity\Listing;
+use TicketsMarketplace\Assessment\Entity\Marketplace;
+use TicketsMarketplace\Assessment\Entity\Ticket;
+use TicketsMarketplace\Assessment\Entity\TicketId;
+use TicketsMarketplace\Assessment\Exception\ListingNotVerifiedException;
+use TicketsMarketplace\Assessment\Exception\TicketAlreadySoldException;
 
 final class MarketPlaceService
 {

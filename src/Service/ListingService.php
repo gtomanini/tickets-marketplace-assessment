@@ -1,16 +1,16 @@
 <?php
 declare(strict_types=1);
 
-namespace TicketSwap\Assessment\Service;
+namespace TicketsMarketplace\Assessment\Service;
 
-use TicketSwap\Assessment\Entity\Listing;
-use TicketSwap\Assessment\Entity\Seller;
-use TicketSwap\Assessment\Exception\ListingCreationException;
-use TicketSwap\Assessment\Entity\Admin;
-use TicketSwap\Assessment\Entity\Barcode;
-use TicketSwap\Assessment\Entity\Buyer;
-use TicketSwap\Assessment\Entity\Ticket;
-use TicketSwap\Assessment\Interface\ListingRepositoryInterface;
+use TicketsMarketplace\Assessment\Entity\Listing;
+use TicketsMarketplace\Assessment\Entity\Seller;
+use TicketsMarketplace\Assessment\Exception\ListingCreationException;
+use TicketsMarketplace\Assessment\Entity\Admin;
+use TicketsMarketplace\Assessment\Entity\Barcode;
+use TicketsMarketplace\Assessment\Entity\Buyer;
+use TicketsMarketplace\Assessment\Entity\Ticket;
+use TicketsMarketplace\Assessment\Interface\ListingRepositoryInterface;
 
 final class ListingService {
     
